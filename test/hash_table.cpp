@@ -1,9 +1,9 @@
-#include "../headers/HashTable.h"
+#include "HashTable.h"
 #include <iostream>
 
 using namespace std;
 
-int main() {
+int main(int argc, char** argv) {
   HashTable<int> hashTable;
   hashTable.set("asdf", 3);
   cout << hashTable.get("asdf") << endl;

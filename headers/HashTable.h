@@ -1,24 +1,27 @@
+#ifndef __HASH_TABLE_INCLUDED_
+#define __HASH_TABLE_INCLUDED_
+
 #include <cstdlib>
 #include <string>
 #include <stdexcept>
 
 template <class T>
 class HashTable {
-private:
-  T * elems;
-  size_t size;
-
-protected:
-  // void resolveConflict();
-  // void shouldExpandMemory();
-  size_t hash(const char*);
-
 public:
   HashTable();
   ~HashTable();
 
   void set(const char*, const T&);
   T get(const char*);
+
+protected:
+  // void resolveConflict();
+  // void shouldExpandMemory();
+  size_t hash(const char*);
+
+private:
+  T * elems;
+  size_t size;
 };
 
 template <class T>
@@ -60,3 +63,5 @@ T HashTable<T>::get(const char* key) {
   size_t hash = this->hash(key);
   return this->elems[hash];
 }
+
+#endif

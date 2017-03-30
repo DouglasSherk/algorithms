@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <string>
 #include <stdexcept>
+#include <iostream>
+
+using namespace std;
 
 #define __VECTOR_DEFAULT_SIZE 16
 
@@ -28,7 +31,7 @@ protected:
   void validateIndexInRange(int) const;
   void validateIndexPossible(int) const;
   void maybeResizeArray();
-  void resizeArray(int);
+  void setCapacity(int);
 
   T* elements;
   int capacityLength;
@@ -39,17 +42,23 @@ template <class T>
 Vector<T>::Vector()
   : elementsLength(0),
     elements(NULL) {
-  this->resizeArray(__VECTOR_DEFAULT_SIZE);
+  this->setCapacity(__VECTOR_DEFAULT_SIZE);
 }
 
 template <class T>
 Vector<T>::Vector(int size)
   : Vector() {
-  this->resizeArray(size);
+  if (size < 0) {
+    throw "Index out of range";
+  }
+  this->elementsLength = size;
+  this->setCapacity(size);
 }
 
 template <class T>
 Vector<T>::~Vector() {
+  cout << "Length: " << this->length() << endl;
+  cout << "Capacity: " << this->capacity() << endl;
   delete [] this->elements;
 }
 
@@ -71,13 +80,13 @@ void Vector<T>::resize(int size) {
     throw "Index out of range";
   }
 
-  this->resizeArray(size * 2);
+  this->setCapacity(size * 2);
   this->elementsLength = size;
 }
 
 template <class T>
 void Vector<T>::clear() {
-  this->resizeArray(__VECTOR_DEFAULT_SIZE);
+  this->setCapacity(__VECTOR_DEFAULT_SIZE);
   this->elementsLength = 0;
 }
 
@@ -146,19 +155,22 @@ int Vector<T>::capacity() const {
 template <class T>
 void Vector<T>::maybeResizeArray() {
   if (this->length() == 0) {
-    this->resizeArray(__VECTOR_DEFAULT_SIZE);
+    this->setCapacity(__VECTOR_DEFAULT_SIZE);
   } else if (this->length() < this->capacity() / 4) {
-    this->resizeArray(this->capacity() / 2);
+    this->setCapacity(this->capacity() / 2);
   } else if (this->length() == this->capacity()) {
-    this->resizeArray(this->capacity() * 2);
+    this->setCapacity(this->capacity() * 2);
   }
 }
 
 template <class T>
-void Vector<T>::resizeArray(int size) {
+void Vector<T>::setCapacity(int capacity) {
+  capacity |= __VECTOR_DEFAULT_SIZE;
+  if (this->capacity() == capacity) { return; }
+
   T* oldElements = this->elements;
-  this->elements = (T*)(new char[sizeof(T) * size]);
-  for (int i = 0; i < size; i++) {
+  this->elements = (T*)(new char[sizeof(T) * capacity]);
+  for (int i = 0; i < capacity; i++) {
     // Zero/default-ctor any elements past the previous boundary.
     if (i >= this->elementsLength) {
       new (&this->elements[i]) T();
@@ -167,7 +179,7 @@ void Vector<T>::resizeArray(int size) {
       new (&this->elements[i]) T(oldElements[i]);
     }
   }
-  this->capacityLength = size;
+  this->capacityLength = capacity;
   delete [] oldElements;
 }
 

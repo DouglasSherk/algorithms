@@ -50,6 +50,26 @@ TEST_F(HashTableTest, Get) {
   EXPECT_EQ(hashTable.get(1), 1);
 }
 
+TEST_F(HashTableTest, Has) {
+  hashTable.set(1, 1);
+  EXPECT_EQ(hashTable.has(1), true);
+}
+
+TEST_F(HashTableTest, Hasnt) {
+  hashTable.set(1, 1);
+  EXPECT_EQ(hashTable.has(2), false);
+}
+
+TEST_F(HashTableTest, HasObj) {
+  hashTableObj.set(TestTuple({1, 1}), 1);
+  EXPECT_EQ(hashTableObj.has(TestTuple({1, 1})), true);
+}
+
+TEST_F(HashTableTest, HasntObj) {
+  hashTableObj.set(TestTuple({1, 1}), 1);
+  EXPECT_EQ(hashTableObj.has(TestTuple({2, 2})), false);
+}
+
 TEST_F(HashTableTest, GetObj) {
   hashTableObj.set(TestTuple({1, 1}), 1);
   EXPECT_EQ(hashTableObj.get(TestTuple({1, 1})), 1);

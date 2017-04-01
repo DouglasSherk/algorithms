@@ -17,6 +17,7 @@ public:
 
   void set(const K&, const V&);
   const V& get(const K&) const;
+  bool has(const K&) const;
   V remove(const K&);
   size_t size() const;
 
@@ -59,7 +60,7 @@ HashTable<K, V>::HashTable()
 
 template <class K, class V>
 HashTable<K, V>::~HashTable() {
-  delete [] this->elems;
+  // delete [] this->elems;
 }
 
 template <class K, class V>
@@ -98,6 +99,13 @@ const V& HashTable<K, V>::get(const K& key) const {
     throw "No element with key";
   }
   return hashTupleVector[index].value;
+}
+
+template <class K, class V>
+bool HashTable<K, V>::has(const K& key) const {
+  size_t hash = this->hash(key);
+  const Vector<HashTuple>& hashTupleVector = this->elems[hash];
+  return hashTupleVector.find(HashTuple({key, V()})) != -1;
 }
 
 template <class K, class V>

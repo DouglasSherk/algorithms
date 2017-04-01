@@ -92,7 +92,8 @@ bool Vector<T>::operator ==(const Vector<T>& other) const {
   }
 
   for (int i = 0; i < length(); i++) {
-    if (this->elements[i] != other[i]) {
+    // Use the == operator so that we don't have to overload != everywhere.
+    if (!(this->elements[i] == other[i])) {
       return false;
     }
   }

@@ -20,7 +20,7 @@ struct TestTuple {
 class HashTableTest : public ::testing::Test {
  protected:
   HashTable<int, int> hashTable;
-  HashTable<TestTuple, int> hashTableObj;
+  HashTable<TestTuple, TestTuple> hashTableObj;
 
   HashTableTest() {
   }
@@ -41,7 +41,8 @@ TEST_F(HashTableTest, Set) {
 }
 
 TEST_F(HashTableTest, SetObj) {
-  hashTableObj.set(TestTuple({1, 1}), 1);
+  TestTuple testTuple({1, 1});
+  hashTableObj.set(testTuple, testTuple);
   EXPECT_EQ(hashTableObj.size(), 1);
 }
 
@@ -61,18 +62,21 @@ TEST_F(HashTableTest, Hasnt) {
 }
 
 TEST_F(HashTableTest, HasObj) {
-  hashTableObj.set(TestTuple({1, 1}), 1);
-  EXPECT_EQ(hashTableObj.has(TestTuple({1, 1})), true);
+  TestTuple testTuple({1, 1});
+  hashTableObj.set(testTuple, testTuple);
+  EXPECT_EQ(hashTableObj.has(testTuple), true);
 }
 
 TEST_F(HashTableTest, HasntObj) {
-  hashTableObj.set(TestTuple({1, 1}), 1);
+  TestTuple testTuple({1, 1});
+  hashTableObj.set(testTuple, testTuple);
   EXPECT_EQ(hashTableObj.has(TestTuple({2, 2})), false);
 }
 
 TEST_F(HashTableTest, GetObj) {
-  hashTableObj.set(TestTuple({1, 1}), 1);
-  EXPECT_EQ(hashTableObj.get(TestTuple({1, 1})), 1);
+  TestTuple testTuple({1, 1});
+  hashTableObj.set(testTuple, testTuple);
+  EXPECT_EQ(hashTableObj.get(testTuple), testTuple);
 }
 
 TEST_F(HashTableTest, Remove) {
@@ -82,8 +86,9 @@ TEST_F(HashTableTest, Remove) {
 }
 
 TEST_F(HashTableTest, RemoveObj) {
-  hashTableObj.set(TestTuple({1, 1}), 1);
-  hashTableObj.remove(TestTuple({1, 1}));
+  TestTuple testTuple({1, 1});
+  hashTableObj.set(testTuple, testTuple);
+  hashTableObj.remove(testTuple);
   EXPECT_EQ(hashTableObj.size(), 0);
 }
 
@@ -99,11 +104,13 @@ TEST_F(HashTableTest, SetMany) {
 
 TEST_F(HashTableTest, SetManyObj) {
   for (int i = 0; i < 1000; i++) {
-    hashTableObj.set(TestTuple({i, i}), i);
+    TestTuple testTuple({i, i});
+    hashTableObj.set(testTuple, testTuple);
   }
   EXPECT_EQ(hashTableObj.size(), 1000);
   for (int i = 0; i < 1000; i++) {
-    EXPECT_EQ(hashTableObj.get(TestTuple({i, i})), i);
+    TestTuple testTuple({i, i});
+    EXPECT_EQ(hashTableObj.get(testTuple), testTuple);
   }
 }
 
@@ -119,12 +126,48 @@ TEST_F(HashTableTest, RemoveMany) {
 
 TEST_F(HashTableTest, RemoveManyObj) {
   for (int i = 0; i < 1000; i++) {
-    hashTableObj.set(TestTuple({i, i}), i);
+    TestTuple testTuple({i, i});
+    hashTableObj.set(testTuple, testTuple);
   }
   for (int i = 0; i < 1000; i++) {
-    hashTableObj.remove(TestTuple({i, i}));
+    TestTuple testTuple({i, i});
+    hashTableObj.remove(testTuple);
   }
   EXPECT_EQ(hashTableObj.size(), 0);
+}
+
+TEST_F(HashTableTest, Tuple) {
+  HashTable<size_t, Vector<size_t>> hashTableObjObj;
+  Vector<size_t> values;
+  values.insertBack(1);
+  values.insertBack(2);
+  hashTableObjObj.set(1, values);
+  EXPECT_EQ(hashTableObjObj.size(), 1);
+  EXPECT_EQ(hashTableObjObj.get(1), values);
+}
+
+TEST_F(HashTableTest, TupleTuple) {
+  struct TestTupleTuple {
+    Vector<TestTuple> keys;
+    Vector<TestTuple> values;
+    operator size_t() const {
+      return keys.length() * 10000 + values.length();
+    }
+    bool operator ==(const TestTupleTuple& other) const {
+      return this->keys == other.keys && this->values == other.values;
+    }
+  };
+
+  HashTable<TestTupleTuple, Vector<TestTuple>> hashTableObjObj;
+  Vector<TestTuple> keys, values;
+  keys.insertBack({1, 1});
+  keys.insertBack({2, 2});
+  values.insertBack({1, 1});
+  values.insertBack({2, 2});
+  TestTupleTuple testTupleTuple({keys, values});
+  hashTableObjObj.set(testTupleTuple, values);
+  EXPECT_EQ(hashTableObjObj.size(), 1);
+  EXPECT_EQ(hashTableObjObj.get(testTupleTuple), values);
 }
 
 } // namespace

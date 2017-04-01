@@ -212,15 +212,9 @@ void Vector<T>::setCapacity(int newCapacity) {
   if (capacity() == newCapacity) { return; }
 
   T* oldElements = this->elements;
-  this->elements = (T*)(new char[sizeof(T) * newCapacity]);
-  for (int i = 0; i < newCapacity; i++) {
-    // Zero/default-ctor any elements past the previous boundary.
-    if (i >= this->elementsLength) {
-      new (&this->elements[i]) T();
-    // Copy elements that were part of the previous data set.
-    } else {
-      new (&this->elements[i]) T(oldElements[i]);
-    }
+  this->elements = new T[newCapacity]();
+  for (int i = 0; i < length(); i++) {
+    new (&this->elements[i]) T(oldElements[i]);
   }
   this->capacityLength = newCapacity;
   delete [] oldElements;

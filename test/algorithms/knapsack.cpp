@@ -84,7 +84,7 @@ TEST_F(KnapsackTest, FourItemsThreeSelectedExcessCapacity) {
 }
 
 TEST_F(KnapsackTest, ManyItems) {
-  int count = 8;
+  int count = 100;
   for (int i = 0; i < count; i++) {
     items.insert(KnapsackItem({1, 1}), 0);
   }
@@ -95,7 +95,7 @@ TEST_F(KnapsackTest, ManyItems) {
 }
 
 TEST_F(KnapsackTest, ManyItemsHalfSelected) {
-  int count = 8;
+  int count = 100;
   for (int i = 0; i < count; i++) {
     items.insert(KnapsackItem({1, 1}), 0);
   }

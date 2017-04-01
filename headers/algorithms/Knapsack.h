@@ -88,7 +88,7 @@ int Knapsack::totalValue(const Vector<KnapsackItem>& items) const {
 // selecting from 10 items takes several seconds.
 Vector<KnapsackItem> Knapsack::getCache(const Vector<KnapsackItem>& items,
                                         const Vector<KnapsackItem>& selected) {
-  const KnapsackTuple& knapsackTuple = KnapsackTuple({items, selected});
+  const KnapsackTuple knapsackTuple({items, selected});
   if (this->cache.has(knapsackTuple)) {
     return this->cache.get(knapsackTuple);
   }

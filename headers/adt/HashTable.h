@@ -41,8 +41,6 @@ protected:
   void repartitionForSize(size_t);
   void repartition(size_t);
 
-  // void resolveConflict();
-  // void shouldExpandMemory();
   size_t hash(const K&) const;
 
   size_t partitions;
@@ -60,12 +58,11 @@ HashTable<K, V>::HashTable()
 
 template <class K, class V>
 HashTable<K, V>::~HashTable() {
-  // delete [] this->elems;
+  delete [] this->elems;
 }
 
 template <class K, class V>
 size_t HashTable<K, V>::hash(const K& key) const {
-  // TODO: Check if we should expand the memory or put it into a better spot.
   return size_t(key) % this->partitions;
 }
 

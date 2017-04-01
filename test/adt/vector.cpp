@@ -147,19 +147,39 @@ TEST_F(VectorTest, Insert) {
   EXPECT_EQ(vector.length(), 1);
 }
 
-TEST_F(VectorTest, InsertFrontMany) {
+TEST_F(VectorTest, InsertIntoFrontMany) {
   for (int i = 0; i < 99; i++) {
-    vector.insert(1, 0);
+    vector.insert(i, 0);
   }
   EXPECT_EQ(vector.length(), 99);
   for (int i = 0; i < 99; i++) {
-    EXPECT_EQ(vector[i], 1);
+    EXPECT_EQ(vector[i], 99 - i - 1);
+  }
+}
+
+TEST_F(VectorTest, InsertIntoBackMany) {
+  for (int i = 0; i < 99; i++) {
+    vector.insert(i, i);
+  }
+  EXPECT_EQ(vector.length(), 99);
+  for (int i = 0; i < 99; i++) {
+    EXPECT_EQ(vector[i], i);
+  }
+}
+
+TEST_F(VectorTest, InsertFrontMany) {
+  for (int i = 0; i < 99; i++) {
+    vector.insertFront(i);
+  }
+  EXPECT_EQ(vector.length(), 99);
+  for (int i = 0; i < 99; i++) {
+    EXPECT_EQ(vector[i], 99 - i - 1);
   }
 }
 
 TEST_F(VectorTest, InsertBackMany) {
   for (int i = 0; i < 99; i++) {
-    vector.insert(i, i);
+    vector.insertBack(i);
   }
   EXPECT_EQ(vector.length(), 99);
   for (int i = 0; i < 99; i++) {

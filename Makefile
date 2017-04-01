@@ -10,6 +10,9 @@ list:
 queue:
 	g++ $(flags) test/adt/queue.cpp -o bin/queue && ./bin/queue
 
+priority_queue:
+	g++ $(flags) test/adt/priority_queue.cpp -o bin/priority_queue && ./bin/priority_queue
+
 vector:
 	g++ $(flags) test/adt/vector.cpp -o bin/vector && ./bin/vector
 

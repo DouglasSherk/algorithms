@@ -25,13 +25,26 @@ class QueueTest : public ::testing::Test {
 
 TEST_F(QueueTest, Enqueue) {
   queue.enqueue(1);
-  EXPECT_EQ(queue.length(), 1);
+  queue.enqueue(2);
+  queue.enqueue(3);
+  EXPECT_EQ(queue.length(), 3);
 }
 
 TEST_F(QueueTest, Dequeue) {
   queue.enqueue(1);
+  queue.enqueue(2);
+  queue.enqueue(3);
   EXPECT_EQ(queue.dequeue(), 1);
+  EXPECT_EQ(queue.dequeue(), 2);
+  EXPECT_EQ(queue.dequeue(), 3);
   EXPECT_EQ(queue.length(), 0);
+}
+
+TEST_F(QueueTest, Peek) {
+  queue.enqueue(1);
+  queue.enqueue(2);
+  queue.enqueue(3);
+  EXPECT_EQ(queue.peek(), 1);
 }
 
 } // namespace

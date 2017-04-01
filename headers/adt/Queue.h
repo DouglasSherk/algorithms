@@ -11,13 +11,19 @@ template <class T>
 class Queue : protected List<T> {
 public:
   void enqueue(const T&);
-  const T& dequeue();
-  int length();
+  T dequeue();
+  int length() const;
+  const T& peek() const;
 };
 
 template <class T>
-int Queue<T>::length() {
+int Queue<T>::length() const {
   return List<T>::length();
+}
+
+template <class T>
+const T& Queue<T>::peek() const {
+  return this->back();
 }
 
 template <class T>
@@ -26,8 +32,8 @@ void Queue<T>::enqueue(const T& value) {
 }
 
 template <class T>
-const T& Queue<T>::dequeue() {
-  const T& value = this->back();
+T Queue<T>::dequeue() {
+  T value = this->back();
   this->removeBack();
   return value;
 }

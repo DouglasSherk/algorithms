@@ -13,11 +13,9 @@ using namespace std;
 template <class T>
 class Vector {
 public:
-  const T& operator [](int) const;
-  T& operator [](int);
   void resize(int);
   void insert(const T&, int);
-  const T& remove(int);
+  T remove(int);
   int find(const T&) const;
   void clear();
   int length() const;
@@ -25,13 +23,20 @@ public:
 
   Vector();
   Vector(int);
+  Vector(const Vector<T>&);
   ~Vector();
+
+  const T& operator [](int) const;
+  T& operator [](int);
+  bool operator ==(const Vector<T>&) const;
+  Vector<T>& operator =(const Vector<T>&);
 
 protected:
   void validateIndexInRange(int) const;
   void validateIndexPossible(int) const;
   void maybeResizeArray();
   void setCapacity(int);
+  void setCapacityForSize(int);
 
   T* elements;
   int capacityLength;
@@ -41,6 +46,7 @@ protected:
 template <class T>
 Vector<T>::Vector()
   : elementsLength(0),
+    capacityLength(0),
     elements(NULL) {
   this->setCapacity(__VECTOR_DEFAULT_SIZE);
 }
@@ -51,14 +57,17 @@ Vector<T>::Vector(int size)
   if (size < 0) {
     throw "Index out of range";
   }
-  this->elementsLength = size;
-  this->setCapacity(size);
+  this->resize(size);
+}
+
+template <class T>
+Vector<T>::Vector(const Vector<T>& other)
+  : Vector() {
+  *this = other;
 }
 
 template <class T>
 Vector<T>::~Vector() {
-  cout << "Length: " << this->length() << endl;
-  cout << "Capacity: " << this->capacity() << endl;
   delete [] this->elements;
 }
 
@@ -75,19 +84,42 @@ T& Vector<T>::operator [](int index) {
 }
 
 template <class T>
-void Vector<T>::resize(int size) {
-  if (size < 0) {
-    throw "Index out of range";
+bool Vector<T>::operator ==(const Vector<T>& other) const {
+  if (this->length() != other.length()) {
+    return false;
   }
 
-  this->setCapacity(size * 2);
+  for (int i = 0; i < this->length(); i++) {
+    if (this->elements[i] != other[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+template <class T>
+Vector<T>& Vector<T>::operator =(const Vector<T>& other) {
+  this->resize(other.length());
+  for (int i = 0; i < other.length(); i++) {
+    this->elements[i] = other[i];
+  }
+  return *this;
+}
+
+template <class T>
+void Vector<T>::resize(int size) {
+  if (size < 0) {
+    throw "Size out of range";
+  }
+
+  this->setCapacityForSize(size);
   this->elementsLength = size;
 }
 
 template <class T>
 void Vector<T>::clear() {
-  this->setCapacity(__VECTOR_DEFAULT_SIZE);
-  this->elementsLength = 0;
+  this->resize(0);
 }
 
 template <class T>
@@ -103,27 +135,24 @@ int Vector<T>::find(const T& value) const {
 template <class T>
 void Vector<T>::insert(const T& value, int index) {
   this->validateIndexPossible(index);
+  this->setCapacityForSize(this->length() + 1);
 
-  for (int i = this->length() - 1; i > index; i--) {
+  for (int i = this->length(); i > index; i--) {
     this->elements[i] = this->elements[i - 1];
   }
   this->elements[index] = value;
   this->elementsLength++;
-
-  this->maybeResizeArray();
 }
 
 template <class T>
-const T& Vector<T>::remove(int index) {
+T Vector<T>::remove(int index) {
   this->validateIndexInRange(index);
 
-  T& element = this->elements[index];
+  T element = this->elements[index];
   for (int i = index; i < this->length() - 1; i++) {
     this->elements[i] = this->elements[i + 1];
   }
-  this->elementsLength--;
-
-  this->maybeResizeArray();
+  this->resize(this->length() - 1);
 
   return element;
 }
@@ -153,19 +182,20 @@ int Vector<T>::capacity() const {
 }
 
 template <class T>
-void Vector<T>::maybeResizeArray() {
-  if (this->length() == 0) {
+void Vector<T>::setCapacityForSize(int size) {
+  if (size == 0) {
     this->setCapacity(__VECTOR_DEFAULT_SIZE);
-  } else if (this->length() < this->capacity() / 4) {
-    this->setCapacity(this->capacity() / 2);
-  } else if (this->length() == this->capacity()) {
-    this->setCapacity(this->capacity() * 2);
+  } else if (size <= this->capacity() / 4 ||
+             size >= this->capacity()) {
+    this->setCapacity(size * 2);
   }
 }
 
 template <class T>
 void Vector<T>::setCapacity(int capacity) {
-  capacity |= __VECTOR_DEFAULT_SIZE;
+  if (capacity < __VECTOR_DEFAULT_SIZE) {
+    capacity = __VECTOR_DEFAULT_SIZE;
+  }
   if (this->capacity() == capacity) { return; }
 
   T* oldElements = this->elements;

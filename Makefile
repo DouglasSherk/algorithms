@@ -1,6 +1,9 @@
 headers = -I"./headers/algorithms" -I"./headers/adt"
 flags = -g -ggdb -std=c++14 -isystem ${GTEST_DIR}/include -L${GTEST_DIR} -lgtest -pthread $(headers)
 
+bs_tree:
+	g++ $(flags) test/adt/bs_tree.cpp -o bin/bs_tree && ./bin/bs_tree
+
 hash_table:
 	g++ $(flags) test/adt/hash_table.cpp -o bin/hash_table && ./bin/hash_table
 

@@ -6,17 +6,25 @@
 
 #include "Pair.h"
 
-#include <iostream>
-using namespace std;
+template <class T>
+class BSTree_iterator;
 
 template <class T>
 class BSTree {
 public:
   BSTree();
+  ~BSTree();
+
+  typedef BSTree_iterator<T> iterator;
 
   void insert(const T&);
   size_t size() const;
   void remove(const T&);
+  iterator find(const T&);
+  void clear();
+
+  iterator begin();
+  iterator end();
 
 protected:
   struct Node {
@@ -31,20 +39,56 @@ protected:
       return this->value > other.value;
     }
 
-    Node(const T&);
+    Node(Node*, const T&);
+
+  protected:
+    friend class BSTree_iterator<T>;
   };
+
+  friend class BSTree_iterator<T>;
+
+  // Parent-position pair for traversal.
+  typedef Pair<Node*, Node**> Traversal;
 
   Node* root;
 
-  Node** traverseTo(const T&);
+  void deleteSubTree(Node*);
+
+  Traversal traverseTo(const T&);
+  Traversal traverse(Node** (*)(Node*, const T&), Node** = NULL, const T& = T());
 };
 
 template <class T>
-BSTree<T>::Node::Node(const T& value)
+class BSTree_iterator
+{
+public:
+  bool operator ==(const BSTree_iterator&) const;
+  bool operator !=(const BSTree_iterator&) const;
+
+  T& operator *() const;
+
+  BSTree_iterator& operator ++();
+
+private:
+  friend class BSTree<T>;
+  // friend class BSTree_const_iterator<T>;
+
+  typename BSTree<T>::Node* node;
+  BSTree<T>* bsTree;
+
+  BSTree_iterator(typename BSTree<T>::Node* node, BSTree<T>* bsTree)
+    : node(node),
+      bsTree(bsTree) {
+
+  }
+};
+
+template <class T>
+BSTree<T>::Node::Node(Node* parent, const T& value)
   : value(value),
     left(NULL),
     right(NULL),
-    parent(NULL) {
+    parent(parent) {
 
 }
 
@@ -63,64 +107,148 @@ BSTree<T>::BSTree()
 }
 
 template <class T>
-typename BSTree<T>::Node** BSTree<T>::traverseTo(const T& value) {
-  Node* prev = NULL;
-  Node* next = root;
-  bool wentRight;
-  while (next && value != next->value) {
-    prev = next;
+BSTree<T>::~BSTree() {
+  clear();
+}
 
-    if (value > next->value) {
-      wentRight = true;
-      next = next->right;
-    } else {
-      wentRight = false;
-      next = next->left;
-    }
+template <class T>
+typename BSTree<T>::iterator BSTree<T>::begin() {
+  Node* node = root;
+  while (node && node->left) {
+    node = node->left;
+  }
+  return iterator(node, this);
+}
+
+template <class T>
+typename BSTree<T>::iterator BSTree<T>::end() {
+  return iterator(NULL, this);
+}
+
+template <class T>
+typename BSTree<T>::Traversal BSTree<T>::traverseTo(const T& val) {
+  return traverse([](Node* node, const T& val) {
+    if (node->value == val) { return (Node**)NULL; }
+    return &(node->value < val ? node->right : node->left);
+  }, NULL, val);
+}
+
+template <class T>
+typename BSTree<T>::Traversal BSTree<T>::traverse(Node** (*compar)(Node*, const T&), Node** start, const T& val) {
+  Node* parent = NULL;
+  Node** position = start;
+  if (!position) {
+    position = &root;
   }
 
-  if (next == root) {
-    return &root;
+  while (*position) {
+    Node** next(compar(*position, val));
+    if (!next) { break; }
+    parent = *position;
+    position = next;
   }
-  return &(wentRight ? prev->right : prev->left);
+
+  return Traversal(parent, position);
 }
 
 template <class T>
 void BSTree<T>::insert(const T& value) {
-  Node** position = traverseTo(value);
-  *position = new Node(value);
+  Traversal traversal(traverseTo(value));
+  *traversal.value = new Node(traversal.key, value);
 }
 
 template <class T>
 void BSTree<T>::remove(const T& value) {
-  Node** position = traverseTo(value);
-  if (!*position) {
+  Traversal removeTraversal(traverseTo(value));
+  if (!*removeTraversal.value) {
     return;
   }
 
-  Node** replacementPosition = &(*position)->left;
-  Node* replacement = *replacementPosition;
-  // Seek to the right-most node in the left sub-tree.
-  while (replacement && replacement->right) {
-    replacementPosition = &replacement->right;
-    replacement = *replacementPosition;
-  }
+  if ((*removeTraversal.value)->left || (*removeTraversal.value)->right) {
+    Traversal* replacementTraversal;
+    if ((*removeTraversal.value)->left) {
+      replacementTraversal = new Traversal(traverse([](Node* node, const T& val) {
+        if (!node->right) { return (Node**)NULL; }
+        return &node->right;
+      }, &(*removeTraversal.value)->left));
+    } else {
+      replacementTraversal = new Traversal(traverse([](Node* node, const T& val) {
+        if (!node->left) { return (Node**)NULL; }
+        return &node->left;
+      }, &(*removeTraversal.value)->right));
+    }
 
-  if (replacement) {
-    // There's a tree beneath this node -- move the next closest element up.
-    delete *replacementPosition;
-    *replacementPosition = NULL;
-    (*position)->value = replacement->value;
+    (*removeTraversal.value)->parent = (*replacementTraversal->value)->parent;
+    (*removeTraversal.value)->value = (*replacementTraversal->value)->value;
+    delete *replacementTraversal->value;
+    *replacementTraversal->value = NULL;
+
+    delete replacementTraversal;
   } else {
-    // This is a leaf node -- just delete it.
-    delete *position;
-    *position = NULL;
+    delete *removeTraversal.value;
+    *removeTraversal.value = NULL;
   }
+}
+
+template <class T>
+typename BSTree<T>::iterator BSTree<T>::find(const T& val) {
+  Traversal traversal(traverseTo(val));
+  return iterator(*traversal.value, this);
+}
+
+template <class T>
+void BSTree<T>::deleteSubTree(Node* node) {
+  if (node == NULL) { return; }
+
+  deleteSubTree(node->left);
+  deleteSubTree(node->right);
+  delete node;
+}
+
+template <class T>
+void BSTree<T>::clear() {
+  deleteSubTree(root);
+  root = NULL;
 }
 
 template <class T>
 size_t BSTree<T>::size() const {
   return root ? root->size() : 0;
+}
+
+template <class T>
+bool BSTree_iterator<T>::operator ==(const BSTree_iterator& rhs) const {
+  return node == rhs.node;
+}
+
+template <class T>
+bool BSTree_iterator<T>::operator !=(const BSTree_iterator& rhs) const {
+  return !(*this == rhs);
+}
+
+template <class T>
+T& BSTree_iterator<T>::operator *() const {
+  return node->value;
+}
+
+template <class T>
+BSTree_iterator<T>& BSTree_iterator<T>::operator ++() {
+  if (node->right) {
+    node = node->right;
+    while (node->left) {
+      node = node->left;
+    }
+  } else if (node->parent) {
+    auto parent = node->parent;
+    while (parent && node == parent->right) {
+      node = parent;
+      parent = parent->parent;
+    }
+    node = parent;
+  } else {
+    node = NULL;
+  }
+  return *this;
 }
 
 #endif

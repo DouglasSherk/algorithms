@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "Vector.h"
+#include "Pair.h"
 
 #define __HASH_TABLE_DEFAULT_SIZE 100
 
@@ -22,19 +23,7 @@ public:
   size_t size() const;
 
 protected:
-  struct HashTuple {
-    K key;
-    V value;
-    // Only needed for `find` operations on the outer Vector.
-    bool operator ==(const HashTuple& other) const {
-      return this->key == other.key;
-    }
-    HashTuple& operator =(const HashTuple& other) {
-      this->key = other.key;
-      this->value = other.value;
-      return *this;
-    }
-  };
+  typedef Pair<K, V> HashTuple;
 
   void setValue(const K&, const V&);
 

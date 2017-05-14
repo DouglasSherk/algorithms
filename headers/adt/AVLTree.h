@@ -29,32 +29,14 @@ protected:
 
 template <class T>
 void AVLTree<T>::insert(const T& val) {
-  Traversal traversal(super::traverseTo(val));
-  *traversal.value = new Node(traversal.key, val);
-  rebalance(this->root, (*traversal.value)->value);
+  super::insert(val);
+  rebalance(this->root, val);
 }
 
 template <class T>
 void AVLTree<T>::remove(const T& val) {
-  Traversal removeTraversal(super::traverseTo(val));
-  if (!*removeTraversal.value) {
-    return;
-  }
-
-  Traversal replacementTraversal(super::traverseToReplacement(removeTraversal));
-  //const T& value = (*replacementTraversal.value)->parent->value;
-  T value;
-  Node* node = (*replacementTraversal.value);
-  if (node && node->parent) {
-    if (node->left == *replacementTraversal.value) {
-      value = node->right->value;
-    }
-    if (node->right == *replacementTraversal.value) {
-      value = node->left->value;
-    }
-  }
   super::remove(val);
-  rebalance(this->root, value);
+  rebalance(this->root, val);
 }
 
 #include <iostream>
@@ -68,14 +50,11 @@ size_t AVLTree<T>::rebalance(Node* currentNode, const T& value) {
       rightHeight = rebalance(currentNode->right, value);
   int balanceFactor = rightHeight - leftHeight;
 
-  // cout << "balance factor: " << balanceFactor << endl;
-
   if (balanceFactor > 1) {
     if (value < currentNode->right->value) {
       rightRotate(currentNode->right);
       leftRotate(currentNode);
     } else {
-      // cout << "left rotating" << endl;
       leftRotate(currentNode);
     }
     leftHeight++;

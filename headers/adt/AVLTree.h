@@ -1,3 +1,16 @@
+/**
+ * Self-balancing AVL tree. Implemented on top of the `BSTree` class.
+ *
+ * Insertion: O(log n)
+ * Retrieval: O(log n)
+ * Deletion: O(log n)
+ * Space: O(n)
+ *
+ * TODO:
+ * - Verify that the tree is always balanced; there may still be off-by-one errors.
+ * - Refactor `Node` mutation code into helper functions on the `Node` class.
+ */
+
 #ifndef __AVL_TREE_INCLUDED_
 #define __AVL_TREE_INCLUDED_
 
@@ -38,9 +51,6 @@ void AVLTree<T>::remove(const T& val) {
   super::remove(val);
   rebalance(this->root, val);
 }
-
-#include <iostream>
-using namespace std;
 
 template <class T>
 size_t AVLTree<T>::rebalance(Node* currentNode, const T& value) {

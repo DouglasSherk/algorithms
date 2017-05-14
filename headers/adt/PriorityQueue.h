@@ -1,3 +1,12 @@
+/**
+ * Priority queue. Built on top of `Queue`, which itself is built on top of `List`.
+ *
+ * Insertion: O(n)
+ * Retrieval: O(n)
+ * Deletion: O(n)
+ * Space: O(n)
+ */
+
 #ifndef __PRIORITY_QUEUE_INCLUDED_
 #define __PRIORITY_QUEUE_INCLUDED_
 

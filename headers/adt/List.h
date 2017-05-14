@@ -1,3 +1,15 @@
+/**
+ * Linked list.
+ *
+ * Insertion: O(n) (or O(1) for front/back)
+ * Retrieval: O(n) (or O(1) for front/back)
+ * Deletion: O(n) (or O(1) for front/back)
+ *
+ * TODO:
+ * - Implement [] operator for retrieval.
+ * - Implement iterators.
+ */
+
 #ifndef __LIST_INCLUDED_
 #define __LIST_INCLUDED_
 

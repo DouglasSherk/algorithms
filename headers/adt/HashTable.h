@@ -1,3 +1,16 @@
+/**
+ * Unordered map implemented as a hash table.
+ *
+ * Insertion: O(1)
+ * Retrieval: O(1)
+ * Deletion: O(1)
+ * Space: O(n)
+ *
+ * TODO:
+ * - Use prime numbers as table sizes.
+ * - Add chaining/linear-quadratic probing/cuckoo conflict resolution policies.
+ */
+
 #ifndef __HASH_TABLE_INCLUDED_
 #define __HASH_TABLE_INCLUDED_
 

@@ -1,3 +1,19 @@
+/**
+ * Binary search tree. Not self-balancing; use a derived implementation, such as
+ * `AVLTree`, for that.
+ *
+ * Insertion: O(h) -> h = tree height
+ * Retrieval: O(h) -> h = tree height
+ * Deletion: O(h) -> h = tree height
+ * Space: O(n)
+ *
+ * TODO:
+ * - Clean up the `traverse()` code. It's too generalized.
+ * - Add const iterator.
+ * - Handle errors and malformed parameters.
+ * - Fix const correctness.
+ */
+
 #ifndef __BS_TREE_INCLUDED_
 #define __BS_TREE_INCLUDED_
 
@@ -41,11 +57,6 @@ protected:
     }
 
     Node(Node*, const T&);
-
-    void swap(Node*);
-    void unlink();
-    void setRight(Node*);
-    void setLeft(Node*);
 
   protected:
     friend class BSTree_iterator<T>;
@@ -106,55 +117,6 @@ size_t BSTree<T>::Node::size() const {
   size += left ? left->size() : 0;
   size += right ? right->size() : 0;
   return size;
-}
-
-template <class T>
-void BSTree<T>::Node::swap(Node* other) {
-  Node* curLeft = left, curRight = right;
-
-  if (other->parent) {
-    if (other->parent->left == other) {
-      other->parent->left = this;
-    } else {
-      other->parent->right = this;
-    }
-  }
-
-  if (parent) {
-    if (parent->left == this) {
-      parent->left = other;
-    } else {
-      parent->right = other;
-    }
-  }
-
-  left = other->left;
-  right = other->right;
-
-  other->left = curLeft;
-  other->right = curRight;
-}
-
-template <class T>
-void BSTree<T>::Node::unlink() {
-  if (!parent) { return; }
-  if (parent->left == this) {
-    parent->left = NULL;
-  } else if (parent->right == this) {
-    parent->right = NULL;
-  }
-}
-
-template <class T>
-void BSTree<T>::Node::setRight(Node* other) {
-  other->parent = this;
-  this->right = other;
-}
-
-template <class T>
-void BSTree<T>::Node::setLeft(Node* other) {
-  other->parent = this;
-  this->right = other;
 }
 
 template <class T>

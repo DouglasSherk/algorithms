@@ -1,3 +1,10 @@
+/**
+ * Queue. Built on top of `List`. It's the same, but has a restricted set of
+ * functionality.
+ *
+ * Performance characteristics are the same as `List`.
+ */
+
 #ifndef __QUEUE_INCLUDED_
 #define __QUEUE_INCLUDED_
 

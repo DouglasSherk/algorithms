@@ -1,3 +1,15 @@
+/**
+ * Self-resizing vector backed by dynamic arrays.
+ *
+ * Insertion: O(n)
+ * Retrieval: O(1)
+ * Deletion: O(n)
+ * Space: O(n)
+ *
+ * TODO:
+ * - Implement iterators.
+ */
+
 #ifndef __VECTOR_INCLUDED_
 #define __VECTOR_INCLUDED_
 

@@ -1,3 +1,10 @@
+/**
+ * A wrapper for generalized key-value pairing.
+ *
+ * TODO:
+ * - Implement additional operators.
+ */
+
 #ifndef __PAIR_INCLUDED_
 #define __PAIR_INCLUDED_
 
@@ -22,6 +29,9 @@ public:
     : key(k),
       value(v) {
 
+  }
+  Pair() {
+    
   }
 };
 

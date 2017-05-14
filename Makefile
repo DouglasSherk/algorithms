@@ -4,6 +4,9 @@ flags = -g -ggdb -std=c++14 -isystem ${GTEST_DIR}/include -L${GTEST_DIR} -lgtest
 bs_tree:
 	g++ $(flags) test/adt/bs_tree.cpp -o bin/bs_tree && ./bin/bs_tree
 
+avl_tree:
+	g++ $(flags) test/adt/avl_tree.cpp -o bin/avl_tree && ./bin/avl_tree
+
 hash_table:
 	g++ $(flags) test/adt/hash_table.cpp -o bin/hash_table && ./bin/hash_table
 

@@ -17,11 +17,12 @@ public:
 
   typedef BSTree_iterator<T> iterator;
 
-  void insert(const T&);
+  virtual void insert(const T&);
   size_t size() const;
-  void remove(const T&);
+  virtual void remove(const T&);
   iterator find(const T&);
   void clear();
+  size_t height() const;
 
   iterator begin();
   iterator end();
@@ -53,9 +54,11 @@ protected:
   Node* root;
 
   void deleteSubTree(Node*);
+  size_t height(Node*) const;
 
   Traversal traverseTo(const T&);
   Traversal traverse(Node** (*)(Node*, const T&), Node** = NULL, const T& = T());
+  Traversal traverseToReplacement(const Traversal&);
 };
 
 template <class T>
@@ -158,6 +161,25 @@ void BSTree<T>::insert(const T& value) {
 }
 
 template <class T>
+typename BSTree<T>::Traversal BSTree<T>::traverseToReplacement(const Traversal& removeTraversal) {
+  Traversal* replacementTraversal;
+  if ((*removeTraversal.value)->left) {
+    replacementTraversal = new Traversal(traverse([](Node* node, const T& val) {
+      if (!node->right) { return (Node**)NULL; }
+      return &node->right;
+    }, &(*removeTraversal.value)->left));
+  } else {
+    replacementTraversal = new Traversal(traverse([](Node* node, const T& val) {
+      if (!node->left) { return (Node**)NULL; }
+      return &node->left;
+    }, &(*removeTraversal.value)->right));
+  }
+  Traversal retVal(*replacementTraversal);
+  delete replacementTraversal;
+  return retVal;
+}
+
+template <class T>
 void BSTree<T>::remove(const T& value) {
   Traversal removeTraversal(traverseTo(value));
   if (!*removeTraversal.value) {
@@ -165,25 +187,12 @@ void BSTree<T>::remove(const T& value) {
   }
 
   if ((*removeTraversal.value)->left || (*removeTraversal.value)->right) {
-    Traversal* replacementTraversal;
-    if ((*removeTraversal.value)->left) {
-      replacementTraversal = new Traversal(traverse([](Node* node, const T& val) {
-        if (!node->right) { return (Node**)NULL; }
-        return &node->right;
-      }, &(*removeTraversal.value)->left));
-    } else {
-      replacementTraversal = new Traversal(traverse([](Node* node, const T& val) {
-        if (!node->left) { return (Node**)NULL; }
-        return &node->left;
-      }, &(*removeTraversal.value)->right));
-    }
+    Traversal replacementTraversal(traverseToReplacement(removeTraversal));
 
-    (*removeTraversal.value)->parent = (*replacementTraversal->value)->parent;
-    (*removeTraversal.value)->value = (*replacementTraversal->value)->value;
-    delete *replacementTraversal->value;
-    *replacementTraversal->value = NULL;
-
-    delete replacementTraversal;
+    (*removeTraversal.value)->parent = (*replacementTraversal.value)->parent;
+    (*removeTraversal.value)->value = (*replacementTraversal.value)->value;
+    delete *replacementTraversal.value;
+    *replacementTraversal.value = NULL;
   } else {
     delete *removeTraversal.value;
     *removeTraversal.value = NULL;
@@ -203,6 +212,21 @@ void BSTree<T>::deleteSubTree(Node* node) {
   deleteSubTree(node->left);
   deleteSubTree(node->right);
   delete node;
+}
+
+template <class T>
+size_t BSTree<T>::height() const {
+  return root ? height(root) : 0;
+}
+
+template <class T>
+size_t BSTree<T>::height(Node* node) const {
+  if (!node) { return 0; }
+
+  size_t leftHeight = height(node->left),
+         rightHeight = height(node->right);
+
+  return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
 }
 
 template <class T>

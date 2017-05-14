@@ -1,6 +1,7 @@
 #include "BSTree.h"
 #include <iostream>
 #include <gtest/gtest.h>
+#include <cmath>
 
 #include "Vector.h"
 
@@ -15,8 +16,14 @@ struct TestSortable {
       series.insertBack(i);
     }
   }
+  TestSortable() : TestSortable(10) {
+
+  }
   bool operator > (const TestSortable& other) const {
     return this->series.length() > other.series.length();
+  }
+  bool operator < (const TestSortable& other) const {
+    return this->series.length() < other.series.length();
   }
   bool operator == (const TestSortable& other) const {
     return this->series == other.series;
@@ -112,6 +119,28 @@ TEST_F(BSTreeTest, FindNonExistent) {
   bsTree.insert(2);
   bsTree.insert(1);
   EXPECT_EQ(bsTree.find(4), bsTree.end());
+}
+
+TEST_F(BSTreeTest, HeightChain) {
+  bsTree.insert(3);
+  bsTree.insert(2);
+  bsTree.insert(1);
+  EXPECT_LE(bsTree.height(), 3);
+}
+
+TEST_F(BSTreeTest, Height) {
+  // Root
+  bsTree.insert(5);
+  // Left sub-tree
+  bsTree.insert(3);
+  bsTree.insert(2);
+  bsTree.insert(4);
+  // Right sub-tree
+  bsTree.insert(8);
+  bsTree.insert(7);
+  bsTree.insert(9);
+  EXPECT_LE(bsTree.height(), 3);
+  EXPECT_GT(bsTree.height(), 0);
 }
 
 TEST_F(BSTreeTest, Destructor) {
